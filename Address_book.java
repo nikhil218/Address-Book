@@ -158,10 +158,23 @@ public class Address_book {
                 System.out.println("Enter Email");
                 list.get(i).setEmail(sc.next());
 
-                System.out.println(list.get(0));
+                System.out.println(list.get(i));
                 System.out.println("Contact for " + name + " is edited Successfully");
             }
 
+        }
+    }
+
+    public static void deleteDetails() {
+        String name;
+        System.out.println("Enter First Name of Contact to be deleted : ");
+        name = sc.next();
+
+        for(int i=0; i<list.size(); i++) {
+            if(name.equals(list.get(i).getFirstName())) {
+                list.remove(i);
+                System.out.println("\nContact for " + name + " is deleted sucessfully");
+            }
         }
     }
 
@@ -171,15 +184,17 @@ public class Address_book {
         Address_book user = new Address_book();
         user.addDetails();
 
-        System.out.println("Do you want to edit the Contact ? \nEnter yes or no");
+        System.out.println("\nDo you want to Delete the Contact ? \nEnter yes or no");
         check = sc.next().toLowerCase();
 
         if(check.equals("yes"))
-            editDetails();
+            deleteDetails();
         else
-            System.out.println("Done");
+            System.out.println("contact not present");
 
-        for (Contact contact : list) System.out.println(contact + "\n");
+        System.out.println("\nAfter deletion the contacts available are : ");
+        for(int i=0; i<list.size(); i++)
+            System.out.println(list.get(i)+"\n");
 
     }
 }
