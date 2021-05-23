@@ -1,9 +1,13 @@
 package com.Address_book;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 class Contact{
     private String firstName;
@@ -220,44 +224,48 @@ public class AddressBook {
         System.out.println("Count of contacts in " + state + " is : " + count);
     }
 
-    private void addContact(){
-        list.add(0,new Contact("surendra", "chouhan", "wadala", "mumbai", "maharashtra", "400037", "9987451480", "chouhansurendra88@gmail.com"));
+    private void addContact() {
+        System.out.println("How many contacts do you want to enter? ");
+        int num=sc.nextInt();
+        list.add(0,new Contact("omkar", "mali", "palaspe", "panvel", "maharastra", "4000129", "90290642", "omkar@gmail.com"));
 
-        System.out.println("\nHow many Contacts do you want to add?");
-        int noOfContact = sc.nextInt();
-
-        for (int i =0; i < noOfContact; i++) {
-            System.out.println("Enter FirstName");
+        for(int i=0; i<num; i++) {
+            System.out.println("Enter First Name");
             String firstName=sc.next();
-            System.out.println("Enter LastName");
+            System.out.println("Enter Last Name");
             String lastName=sc.next();
             System.out.println("Enter Address");
             String address=sc.next();
-            System.out.println("Enter City");
+            System.out.println("Enter City Name");
             String city=sc.next();
-            System.out.println("Enter State");
+            System.out.println("Enter State Name");
             String state=sc.next();
-            System.out.println("Enter ZipCode");
+            System.out.println("Enter Zip Code");
             String zip=sc.next();
-            System.out.println("Enter PhoneNumber");
+            System.out.println("Enter Phone Number");
             String phoneNumber=sc.next();
             System.out.println("Enter Email");
             String email=sc.next();
 
-            if(!firstName.equals(list.get(0).getFirstName()))
-            {
+            if(!firstName.equals(list.get(0).getFirstName())) {
                 list.add( new Contact(firstName, lastName, address, city, state, zip, phoneNumber, email));
-                System.out.println("\nContact for " + firstName + " is added successfully");
+                System.out.println(list);
             }
-            else
-            {
-                System.out.println("\nYou have already entered this contact");
+            else {
+                System.out.println("You have already entered this contact");
                 break;
             }
-            addressbook.toString();
-
         }
-        addressbook.toString();
+
+        Comparator<Contact> list1 = Comparator.comparing(Contact::getFirstName);
+        System.out.println("\n After Sorting the contact details are: \n");
+        list.stream().sorted(list1).forEach(System.out::println);
+    }
+
+    private void displayDetails() {
+        Comparator<Contact> list1 = Comparator.comparing(Contact::getFirstName);
+        System.out.println("\n After Sorting the contact details are: \n");
+        list.stream().sorted(list1).forEach(System.out::println);
     }
 
     public static String editContact() {
