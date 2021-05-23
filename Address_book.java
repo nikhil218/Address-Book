@@ -1,7 +1,15 @@
 package com.Address_book;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
+
+class ContactAlreadyExistsException extends Exception{
+    public ContactAlreadyExistsException(String message) {
+        super(message);
+        // TODO Auto-generated constructor stub
+    }
+}
 
 class Contact{
     private String firstName;
@@ -22,6 +30,11 @@ class Contact{
         this.zip = zip;
         this.phoneNumber = phoneNumber;
         this.email = email;
+    }
+
+
+    public Contact() {
+        // TODO Auto-generated constructor stub
     }
 
 
@@ -90,7 +103,7 @@ class Contact{
     }
 
     public String toString(){
-        return "Details of: "+ firstName+ " "+lastName+"\n"
+        return "\nDetails of: "+ firstName+ " "+lastName+"\n"
                 +"Address: "+address+"\n"
                 +"City: "+city+"\n"
                 +"State: "+state+"\n"
@@ -100,15 +113,31 @@ class Contact{
     }
 }
 
-public class Address_book {
+public class AddressBook {
     static ArrayList<Contact> list = new ArrayList<Contact>();
+    public static AddressBook addressbook = new AddressBook();
+    public static HashMap<String, AddressBook> addressBooks = new HashMap<>();
+    public static Contact contact = new Contact();
 
     static Scanner sc = new Scanner(System.in);
-    public static String check = "yes";
 
-    private void addDetails(){
+    private void addAddressBook(){
+        System.out.println("Enter the name of the new address book : ");
+        String name = sc.next();
 
-        System.out.println("How many Contacts do you want to add?");
+        addressbook = new AddressBook();
+        addressBooks.put(name, addressbook);
+
+        System.out.println("New Address Book is Added as " + name);
+    }
+
+    private void addContact(){
+        list.add(0,new Contact("surendra", "chouhan", "wadala", "mumbai", "maharashtra", "400037", "9987451480", "chouhansurendra88@gmail.com"));
+        System.out.println("\nContacts already available are : ");
+        for(int i=0; i<list.size(); i++)
+            System.out.println(list.get(i)+"\n");
+
+        System.out.println("\nHow many Contacts do you want to add?");
         int noOfContact = sc.nextInt();
 
         for (int i =0; i < noOfContact; i++) {
@@ -129,17 +158,28 @@ public class Address_book {
             System.out.println("Enter Email");
             String email=sc.next();
 
-            list.add(new Contact(firstName, lastName, address, city, state, zip, phoneNumber, email));
-            System.out.println("Contact for " + firstName + " is added Successfully!");
+            if(!firstName.equals(list.get(0).getFirstName()))
+            {
+                list.add( new Contact(firstName, lastName, address, city, state, zip, phoneNumber, email));
+                System.out.println("\nContact for " + firstName + " is added successfully");
+            }
+            else
+            {
+                System.out.println("\nYou have already entered this contact");
+                break;
+            }
+            addressbook.toString();
+
         }
+        addressbook.toString();
     }
 
-    public static void editDetails() {
+    public static String editContact() {
         String name;
         System.out.println("Enter First Name of Contact to be Edited : ");
         name = sc.next();
 
-        for(int i=0; i<list.size(); i++) {
+        for(int i=0; i < list.size(); i++) {
             if(name.equals(list.get(i).getFirstName())) {
                 System.out.println("Enter FirstName");
                 list.get(i).setFirstName(sc.next());
@@ -158,43 +198,62 @@ public class Address_book {
                 System.out.println("Enter Email");
                 list.get(i).setEmail(sc.next());
 
-                System.out.println(list.get(i));
-                System.out.println("Contact for " + name + " is edited Successfully");
+                System.out.println("\n" + list.get(i));
+                return "\nContact for " + name + " is edited Successfully";
             }
-
         }
+        return "\n" + name + " is not available in Contact list.";
     }
 
-    public static void deleteDetails() {
+    public static String deleteContact(){
         String name;
-        System.out.println("Enter First Name of Contact to be deleted : ");
+        System.out.println("\nEnter First Name : ");
         name = sc.next();
 
-        for(int i=0; i<list.size(); i++) {
-            if(name.equals(list.get(i).getFirstName())) {
-                list.remove(i);
-                System.out.println("\nContact for " + name + " is deleted sucessfully");
+        for(int i=0; i < list.size(); i++) {
+            if(name.equals(list.get(0).getFirstName())) {
+                list.remove(0);
+                return ("\nContact for " + name + " is deleted sucessfully");
             }
         }
+        return "\n" + name + " is not available in Contact list";
     }
 
     public static void main(String[] args) {
         System.out.println("Welcome To Address Book Problem\n");
 
-        Address_book user = new Address_book();
-        user.addDetails();
+        AddressBook address = new AddressBook();
+        address.addContact();
+        int check=0;
 
-        System.out.println("\nDo you want to Delete the Contact ? \nEnter yes or no");
-        check = sc.next().toLowerCase();
-
-        if(check.equals("yes"))
-            deleteDetails();
-        else
-            System.out.println("contact not present");
-
-        System.out.println("\nAfter deletion the contacts available are : ");
-        for(int i=0; i<list.size(); i++)
-            System.out.println(list.get(i)+"\n");
-
+        while(check != 6) {
+            System.out.println("\n1. Add Address Book \n2. Add Contact \n3. View Available Contacts \n4. Edit Contact \n5. Delete Contact \n6. Exit" );
+            check = sc.nextInt();
+            switch(check) {
+                case 1:
+                    address.addAddressBook();
+                    break;
+                case 2:
+                    address.addContact();
+                    break;
+                case 3:
+                    System.out.println("\nContacts available are : ");
+                    for(int i=0; i<list.size(); i++)
+                        System.out.println(list.get(i)+"\n");
+                    break;
+                case 4:
+                    editContact();
+                    for(int i=0; i<list.size(); i++)
+                        System.out.println(list.get(i));
+                    break;
+                case 5:
+                    deleteContact();
+                    for(int i=0; i<list.size(); i++)
+                        System.out.println(list.get(i));
+                    break;
+                case 6:
+                    System.out.println("Thanks");
+            }
+        }
     }
 }
