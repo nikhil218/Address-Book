@@ -1,5 +1,9 @@
 package com.Address_book;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -136,6 +140,8 @@ public class AddressBook
     public HashMap<String,String> statedict=new HashMap<>();
     public int count=0;
 
+    public Path path = Paths.get("C:\\Users\\nikhi\\IdeaProjects\\Address_Book\\addressbook.txt");
+
     public AddressBook(String str) {
 
     }
@@ -154,7 +160,6 @@ public class AddressBook
         book.get(2).list.add(new Contact("gaurav", "purao", "kohinoor", "thane", "tamilnadu", "4040091", "82828882", "gaurav@gmail.com"));
     }
 
-
     public static void addAddressBook() {
         System.out.print("Enter name of new Address Book: ");
         String str=sc.next();
@@ -164,62 +169,46 @@ public class AddressBook
     public void searchPersonByCity() {
         System.out.println("Enter city for the contact info: ");
         String city=sc.next();
-        for(int i=0;i<list.size();i++) {
-            if(city.equals(list.get(i).getCity())) {
-                System.out.println(list.get(i));
-            }
-        }
+
+        System.out.println("\nContact details of Person in " + city + " city are : \n");
+        list.stream().filter(contact -> contact.getCity().equals(city)).forEach(System.out::println);
     }
 
     public void searchPersonByState() {
         System.out.println("Enter state for the contact info: ");
         String state=sc.next();
-        for(int i=0;i<list.size();i++) {
-            if(state.equals(list.get(i).getState())) {
-                System.out.println(list.get(i));
-            }
-        }
+
+        System.out.println("\nContact details of Person in " + state + " state are : \n");
+        list.stream().filter(contact -> contact.getState().equals(state)).forEach(System.out::println);
     }
 
     public void personCityDictionary() {
-        for(AddressBook address : book) {
-            for(Contact contact : address.list) {
-                String name=contact.getFirstName();
-                citydict.put(name, contact.getCity());
-            }
-        }
-        System.out.println("Enter the city name to search for contacts: ");
+        System.out.println("Enter City Name");
         String city=sc.next();
-        int count = 0;
-        for(Entry<String, String> entry : citydict.entrySet()) {
-            if(city.equals(entry.getValue())) {
-                System.out.println("Person from "+entry.getValue()+" city are: "+entry.getKey());
-                count+=1;
-            }
-        }
-        System.out.println("Count of contacts in " + city + " city is: " + count);
+
+        book.forEach(address -> address.list.stream()
+                .filter(contact -> contact.getCity().equals(city))
+                .forEach(contact -> citydict.put((contact.getFirstName()), contact.getCity())));
+
+        citydict.forEach((key, value) -> System.out.println(key));
+
+        System.out.println("Count is : " + citydict.size());
     }
 
     public void personStateDictionary() {
-        for(AddressBook address : book) {
-            for(Contact contact : address.list) {
-                String name = contact.getFirstName();
-                statedict.put(name, contact.getState());
-            }
-        }
-        System.out.println("Enter the state name to search for contacts: ");
+        System.out.println("Enter State Name");
         String state=sc.next();
-        int count = 0;
-        for(Entry<String, String> entry:statedict.entrySet()) {
-            if(state.equals(entry.getValue())) {
-                System.out.println("Person from " + entry.getValue() + " State is: " + entry.getKey());
-                count+=1;
-            }
-        }
-        System.out.println("Count of contacts in " + state + " state is: " + count);
+
+        book.forEach(address -> address.list.stream()
+                .filter(contact -> contact.getState().equals(state))
+                .forEach(contact -> statedict.put((contact.getFirstName()), contact.getCity())));
+
+        statedict.forEach((key, value) -> System.out.println(key));
+
+        System.out.println("Count is : " + statedict.size());
     }
 
-    private void addDetails() {
+    private void addDetails() throws IOException{
         System.out.println("How many contacts do you want to enter? ");
         int num=sc.nextInt();
         list.add(0,new Contact("omkar", "mali", "palaspe", "panvel", "maharastra", "4000129", "90290642", "omkar@gmail.com"));
@@ -251,6 +240,21 @@ public class AddressBook
                 break;
             }
         }
+
+        Comparator<Contact> list1 = Comparator.comparing(Contact::getFirstName);
+        System.out.println("\nAfter Sorting the contact details are : ");
+        list.stream().sorted(list1).forEach(System.out::println);
+    }
+
+    public void writeData() throws IOException {
+        StringBuffer buffer = new StringBuffer();
+
+        for(int i=0; i<list.size(); i++)
+            Files.write(path, list.toString().getBytes());
+    }
+
+    public void readData() throws IOException {
+        Files.lines(path).forEach(System.out::println);
     }
 
     public void sortByCity() {
@@ -324,13 +328,10 @@ public class AddressBook
         address.defaultContact();
         int check = 0;
 
-        address.sortByCity();
-        address.sortByState();
-
-        while(check != 10) {
+        while(check != 12) {
             System.out.print("\n1.Add AddressBook \n2.Add Contact \n3.Display Contact \n4.Delete \n5.Edit"
                     + "\n6.Search for contacts based on city \n7.Search for contacts based on state"
-                    + "\n8.To see name of a person based on city \n9.To see name of a person based on state \n10.Exit\n");
+                    + "\n8.To see name of a person based on city \n9.To see name of a person based on state \n10. Sort_By_City \n11.Sort_By_State \n12.Exit\n");
             check=sc.nextInt();
 
             switch(check) {
@@ -338,11 +339,24 @@ public class AddressBook
                     addAddressBook();
                     break;
                 case 2:
-                    address.addDetails();
-                    //address.sortEnteries();
+                    try {
+                        address.addDetails();
+                        address.writeData();
+                        address.readData();
+                    }
+                    catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                     break;
                 case 3:
-                    address.displayDetails();
+                    try {
+                        address.readData();
+                    }
+                    catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                     break;
                 case  4:
                     deleteContacts();
@@ -369,6 +383,12 @@ public class AddressBook
                     address.personStateDictionary();
                     break;
                 case 10:
+                    address.sortByCity();
+                    break;
+                case 11:
+                    address.sortByState();
+                    break;
+                case 12:
                     System.out.println("Thank you!!!");
                     break;
                 default:
